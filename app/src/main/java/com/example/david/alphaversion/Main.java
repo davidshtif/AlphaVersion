@@ -42,6 +42,7 @@ public class Main extends AppCompatActivity{
         list=(ListView)findViewById(R.id.list);
         ref=FirebaseDatabase.getInstance().getReference("products");
         productList=new ArrayList<>();
+        // Hi
 
         list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
