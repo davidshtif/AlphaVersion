@@ -1,8 +1,6 @@
 package com.example.david.alphaversion;
 
-import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -29,8 +27,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.koushikdutta.async.future.FutureCallback;
@@ -42,7 +38,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.UUID;
 
 public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
@@ -72,7 +67,9 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
         list=(ListView)findViewById(R.id.list);
         image=(ImageView) findViewById(R.id.imageView);
         pick=(TextView)findViewById(R.id.picked);
-
+        et1.setText("");
+        et2.setText("");
+        pick.setText("");
 
         ref=FirebaseDatabase.getInstance().getReference("products");
         productList=new ArrayList<>();
@@ -167,8 +164,6 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
         final ImageView newP=(ImageView) dialogView.findViewById(R.id.pic);
 
         barcode=product.getBarcode();
-        String url="https://m.pricez.co.il/ProductPictures/"+product.getBarcode()+".jpg";
-        String exp=product.getExpired();
 
         if(product.getBarcode()!=null){
             product.setBarcode(loadImageFromUrl(product.getBarcode(),newP));
@@ -384,25 +379,10 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
             try {
                 if(!productList.isEmpty()){
                     Picasso.get().load("https://m.pricez.co.il/ProductPictures/"+barcode+".jpg").into(image);
-                    currentProduct.setBarcode(""+barcode);
 
                     if(dialogView!=null){
                         Picasso.get().load("https://m.pricez.co.il/ProductPictures/"+barcode+".jpg").into((ImageView)dialogView.findViewById(R.id.pic));
                     }
-
-                    Ion.with(getApplicationContext())
-                            .load("https://chp.co.il/%D7%91%D7%90%D7%A8%20%D7%A9%D7%91%D7%A2/0/0/"+barcode+"/0")
-                            .asString()
-                            .setCallback(new FutureCallback<String>() {
-                                @Override
-                                public void onCompleted(Exception e, String result) {
-                                    result=result.substring(72,result.indexOf("</title>",49));
-                                    currentProduct.setName(result.substring(0,result.indexOf(",")));
-                                    currentProduct.setWeight(result.substring(result.indexOf(", ")+2));
-                                    et1.setText(""+currentProduct.getName());
-                                    et2.setText(""+currentProduct.getWeight());
-                                }
-                            });
                 }
             } catch (Exception e) {
                 e.printStackTrace();
