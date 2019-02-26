@@ -33,6 +33,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
@@ -46,12 +48,13 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
 
     EditText et1,et2;
     ListView list;
-    String name,weight,enterD,enterT,expired,barcode,url;
+    String name,weight,enterD,enterT,expired,barcode;
     DatabaseReference ref;
     Button button,scan;
     ImageView image;
     List<Product> productList;
     TextView pick;
+    boolean isScan;
     private AlertDialog.Builder dialogBuilder;
     private View dialogView;
     private TextView expDate;
@@ -62,11 +65,15 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        isScan=false;
+
         et1=(EditText)findViewById(R.id.editText);
         et2=(EditText)findViewById(R.id.editText2);
         list=(ListView)findViewById(R.id.list);
         image=(ImageView) findViewById(R.id.imageView);
         pick=(TextView)findViewById(R.id.picked);
+
+
         ref=FirebaseDatabase.getInstance().getReference("products");
         productList=new ArrayList<>();
 
@@ -187,35 +194,35 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
                 String name=editTextName.getText().toString();
                 String sWeight=editTextWeight.getText().toString();
                 if(name.isEmpty()&&sWeight.isEmpty()){
-                    updateProduct(product.getId(),product.getName(),product.getEnterD(),product.getEnterT(),product.getExpired(),barcode,product.getWeight());
-                    image.setImageResource(R.drawable.no_image);
-                    alertDialog.dismiss();
+                    updateProduct(product.getId(),product.getName(),product.getEnterD(),product.getEnterT(),product.getExpired(),barcode,product.getWeight(),isScan);
                 }
                 else{
                     if(!name.isEmpty()){
-                        updateProduct(product.getId(),name,product.getEnterD(),product.getEnterT(),product.getExpired(),barcode,product.getWeight());
-                        image.setImageResource(R.drawable.no_image);
-                        alertDialog.dismiss();
+                        updateProduct(product.getId(),name,product.getEnterD(),product.getEnterT(),product.getExpired(),barcode,product.getWeight(),isScan);
                     }
                     else{
                         if(!sWeight.isEmpty()){
-                            updateProduct(product.getId(),product.getName(),product.getEnterD(),product.getEnterT(),product.getExpired(),barcode,Double.parseDouble(sWeight));
-                            image.setImageResource(R.drawable.no_image);
-                            alertDialog.dismiss();
+                            updateProduct(product.getId(),product.getName(),product.getEnterD(),product.getEnterT(),product.getExpired(),barcode,sWeight,isScan);
                         }
                         else{
-                            updateProduct(product.getId(),name,product.getEnterD(),product.getEnterT(),product.getExpired(),barcode,Double.parseDouble(sWeight));
-                            image.setImageResource(R.drawable.no_image);
-                            alertDialog.dismiss();
+                            updateProduct(product.getId(),name,product.getEnterD(),product.getEnterT(),product.getExpired(),barcode,sWeight,isScan);
                         }
                     }
                 }
+                image.setImageResource(R.drawable.no_image);
+                isScan=false;
+                barcode=null;
+                et1.setText("");
+                et2.setText("");
+                alertDialog.dismiss();
             }
         });
 
         buttonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view){
+                barcode=null;
+                isScan=false;
                 alertDialog.dismiss();
             }
         });
@@ -224,6 +231,8 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
             @Override
             public void onClick(View view){
                 deleteProduct(product.getId());
+                barcode=null;
+                isScan=false;
                 alertDialog.dismiss();
             }
         });
@@ -237,8 +246,7 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
                 if(datePicker.isHidden()){
                     product.setExpired(expired);
                 }
-
-
+                isScan=true;
                             }
         });
 
@@ -249,8 +257,6 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
                     IntentIntegrator scanIntegrator = new IntentIntegrator(Main.this);
                     scanIntegrator.initiateScan();
 
-                    product.setBarcode(loadImageFromUrl(barcode,newP));
-                    Picasso.get().load("https://m.pricez.co.il/ProductPictures/"+barcode+".jpg").into(newP);
                 }
             }
         });
@@ -262,9 +268,9 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
         Toast.makeText(this,"Product deleted",Toast.LENGTH_SHORT).show();
     }
 
-    private boolean updateProduct(String id,String name,String enterD,String enterT,String expired,String barcode,double weight){
+    private boolean updateProduct(String id,String name,String enterD,String enterT,String expired,String barcode,String weight,boolean isScan){
         DatabaseReference databaseReference=FirebaseDatabase.getInstance().getReference("products").child(id);
-        Product product=new Product(id,name,enterD,enterT,expired,barcode,weight);
+        Product product=new Product(id,name,enterD,enterT,expired,barcode,weight,isScan);
         databaseReference.setValue(product);
         Toast.makeText(this,"Updated Successfully",Toast.LENGTH_SHORT).show();
         return true;
@@ -297,34 +303,106 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
     public void upload(View view) {
         name=et1.getText().toString();
         weight=et2.getText().toString();
+        if(isScan) {
+            name = setName();
+            weight = setWeight();
+        }
         Calendar date=Calendar.getInstance();
         Calendar time=Calendar.getInstance();
         enterD=DateFormat.getDateInstance(DateFormat.SHORT).format(date.getTime());
         SimpleDateFormat mdformat=new SimpleDateFormat("HH:mm:ss");
         enterT=mdformat.format(time.getTime());
         if(name.equals(""))
-            Toast.makeText(this,"You didn't enter a name",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"You didn't enter a name or scanned anything",Toast.LENGTH_SHORT).show();
         else if(weight.equals(""))
-                Toast.makeText(this,"You didn't enter a weight",Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,"You didn't enter a weight or scanned anything",Toast.LENGTH_SHORT).show();
             else{
                 String id=ref.push().getKey();
-                Product product=new Product(id,name,enterD,enterT,expired,barcode,Double.parseDouble(weight));
+                Product product=new Product(id,name,enterD,enterT,expired,barcode,weight,isScan);
                 ref.child(id).setValue(product);
                 et1.setText("");
+                name="";
                 et2.setText("");
+                weight="";
+                barcode=null;
                 pick.setText("");
+                isScan=false;
                 image.setImageResource(R.drawable.no_image);
             }
+    }
+
+    private String setWeight() {
+        Ion.with(getApplicationContext())
+                .load("https://chp.co.il/%D7%91%D7%90%D7%A8%20%D7%A9%D7%91%D7%A2/0/0/"+barcode+"/0")
+                .asString()
+                .setCallback(new FutureCallback<String>() {
+                    @Override
+                    public void onCompleted(Exception e, String result) {
+                        result=result.substring(72,result.indexOf("</title>",49));
+                        result.substring(0,result.indexOf(","));
+                        weight=result.substring(result.indexOf(", ")+2);
+                    }
+                });
+        return weight;
+    }
+
+    private String setName() {
+        Ion.with(getApplicationContext())
+                .load("https://chp.co.il/%D7%91%D7%90%D7%A8%20%D7%A9%D7%91%D7%A2/0/0/"+barcode+"/0")
+                .asString()
+                .setCallback(new FutureCallback<String>() {
+                    @Override
+                    public void onCompleted(Exception e, String result) {
+                        result=result.substring(72,result.indexOf("</title>",49));
+                        name=result.substring(0,result.indexOf(","));
+                    }
+                });
+        return name;
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
         if (scanningResult != null) {
             barcode= scanningResult.getContents();
-            barcode=loadImageFromUrl(barcode,image);
+            barcode= loadImageFromUrl(barcode,image);
+            isScan=true;
+            Ion.with(getApplicationContext())
+                    .load("https://chp.co.il/%D7%91%D7%90%D7%A8%20%D7%A9%D7%91%D7%A2/0/0/"+barcode+"/0")
+                    .asString()
+                    .setCallback(new FutureCallback<String>() {
+                        @Override
+                        public void onCompleted(Exception e, String result) {
+                            result=result.substring(72,result.indexOf("</title>",49));
+                            name=result.substring(0,result.indexOf(","));
+                            weight=result.substring(result.indexOf(", ")+2);
+
+                            et1.setText(""+name);
+                            et2.setText(""+weight);
+                        }
+                    });
+
             try {
                 if(!productList.isEmpty()){
-                    Picasso.get().load("https://m.pricez.co.il/ProductPictures/"+barcode+".jpg").into((ImageView) dialogView.findViewById(R.id.pic));
+                    Picasso.get().load("https://m.pricez.co.il/ProductPictures/"+barcode+".jpg").into(image);
+                    currentProduct.setBarcode(""+barcode);
+
+                    if(dialogView!=null){
+                        Picasso.get().load("https://m.pricez.co.il/ProductPictures/"+barcode+".jpg").into((ImageView)dialogView.findViewById(R.id.pic));
+                    }
+
+                    Ion.with(getApplicationContext())
+                            .load("https://chp.co.il/%D7%91%D7%90%D7%A8%20%D7%A9%D7%91%D7%A2/0/0/"+barcode+"/0")
+                            .asString()
+                            .setCallback(new FutureCallback<String>() {
+                                @Override
+                                public void onCompleted(Exception e, String result) {
+                                    result=result.substring(72,result.indexOf("</title>",49));
+                                    currentProduct.setName(result.substring(0,result.indexOf(",")));
+                                    currentProduct.setWeight(result.substring(result.indexOf(", ")+2));
+                                    et1.setText(""+currentProduct.getName());
+                                    et2.setText(""+currentProduct.getWeight());
+                                }
+                            });
                 }
             } catch (Exception e) {
                 e.printStackTrace();

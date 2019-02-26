@@ -7,9 +7,10 @@ public class Product {
     public String enterT;
     public String expired;
     public String barcode;
-    public double weight;
+    public String weight;
+    public boolean isScan=false;
 
-    public Product(String id, String name, String enterD, String enterT, String expired, String barcode, double weight) {
+    public Product(String id, String name, String enterD, String enterT, String expired, String barcode, String weight, boolean isScan) {
         this.id = id;
         this.name = name;
         this.enterD = enterD;
@@ -17,6 +18,7 @@ public class Product {
         this.expired = expired;
         this.barcode=barcode;
         this.weight = weight;
+        this.isScan = isScan;
     }
 
     public Product() {
@@ -70,11 +72,19 @@ public class Product {
         this.name = name;
     }
 
-    public double getWeight() {
+    public String getWeight() {
         return weight;
     }
 
-    public void setWeight(double weight) {
+    public void setWeight(String weight) {
         this.weight = weight;
+    }
+
+    public boolean getIsScan() {
+        return isScan;
+    }
+
+    public void setIsScan(boolean isScan) {
+        isScan = isScan;
     }
 }
