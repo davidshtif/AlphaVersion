@@ -88,6 +88,10 @@
         "source": "C:\\Users\\DavidHohevBaTahat\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-28.0.0.aar\\f37dff965ddc510b1a891ea2badc9fff\\res\\drawable-xhdpi-v4\\abc_list_pressed_holo_light.9.png"
     },
     {
+        "merged": "C:\\Users\\DavidHohevBaTahat\\StudioProjects\\AlphaVersion\\app\\build\\intermediates\\res\\merged\\debug\\drawable_no_image.png.flat",
+        "source": "C:\\Users\\DavidHohevBaTahat\\StudioProjects\\AlphaVersion\\app\\src\\main\\res\\drawable\\no_image.png"
+    },
+    {
         "merged": "C:\\Users\\DavidHohevBaTahat\\StudioProjects\\AlphaVersion\\app\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4_googleg_standard_color_18.png.flat",
         "source": "C:\\Users\\DavidHohevBaTahat\\.gradle\\caches\\transforms-1\\files-1.1\\play-services-base-16.0.1.aar\\f626c1df7dd783fe99c03d97a0d63d31\\res\\drawable-xhdpi-v4\\googleg_standard_color_18.png"
     },
@@ -320,6 +324,10 @@
         "source": "C:\\Users\\DavidHohevBaTahat\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-28.0.0.aar\\f37dff965ddc510b1a891ea2badc9fff\\res\\color\\abc_btn_colored_borderless_text_material.xml"
     },
     {
+        "merged": "C:\\Users\\DavidHohevBaTahat\\StudioProjects\\AlphaVersion\\app\\build\\intermediates\\res\\merged\\debug\\raw_zxing_beep.ogg.flat",
+        "source": "C:\\Users\\DavidHohevBaTahat\\.gradle\\caches\\transforms-1\\files-1.1\\zxing-android-embedded-3.5.0.aar\\06b6cb57321dda889b5ae3a4fa23f429\\res\\raw\\zxing_beep.ogg"
+    },
+    {
         "merged": "C:\\Users\\DavidHohevBaTahat\\StudioProjects\\AlphaVersion\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4_abc_spinner_mtrl_am_alpha.9.png.flat",
         "source": "C:\\Users\\DavidHohevBaTahat\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-28.0.0.aar\\f37dff965ddc510b1a891ea2badc9fff\\res\\drawable-mdpi-v4\\abc_spinner_mtrl_am_alpha.9.png"
     },
@@ -536,6 +544,10 @@
         "source": "C:\\Users\\DavidHohevBaTahat\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-28.0.0.aar\\f37dff965ddc510b1a891ea2badc9fff\\res\\layout\\abc_alert_dialog_button_bar_material.xml"
     },
     {
+        "merged": "C:\\Users\\DavidHohevBaTahat\\StudioProjects\\AlphaVersion\\app\\build\\intermediates\\res\\merged\\debug\\layout_zxing_barcode_scanner.xml.flat",
+        "source": "C:\\Users\\DavidHohevBaTahat\\.gradle\\caches\\transforms-1\\files-1.1\\zxing-android-embedded-3.5.0.aar\\06b6cb57321dda889b5ae3a4fa23f429\\res\\layout\\zxing_barcode_scanner.xml"
+    },
+    {
         "merged": "C:\\Users\\DavidHohevBaTahat\\StudioProjects\\AlphaVersion\\app\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4_abc_ic_star_black_48dp.png.flat",
         "source": "C:\\Users\\DavidHohevBaTahat\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-28.0.0.aar\\f37dff965ddc510b1a891ea2badc9fff\\res\\drawable-xhdpi-v4\\abc_ic_star_black_48dp.png"
     },
@@ -666,6 +678,10 @@
     {
         "merged": "C:\\Users\\DavidHohevBaTahat\\StudioProjects\\AlphaVersion\\app\\build\\intermediates\\res\\merged\\debug\\color_abc_tint_btn_checkable.xml.flat",
         "source": "C:\\Users\\DavidHohevBaTahat\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-28.0.0.aar\\f37dff965ddc510b1a891ea2badc9fff\\res\\color\\abc_tint_btn_checkable.xml"
+    },
+    {
+        "merged": "C:\\Users\\DavidHohevBaTahat\\StudioProjects\\AlphaVersion\\app\\build\\intermediates\\res\\merged\\debug\\layout_zxing_capture.xml.flat",
+        "source": "C:\\Users\\DavidHohevBaTahat\\.gradle\\caches\\transforms-1\\files-1.1\\zxing-android-embedded-3.5.0.aar\\06b6cb57321dda889b5ae3a4fa23f429\\res\\layout\\zxing_capture.xml"
     },
     {
         "merged": "C:\\Users\\DavidHohevBaTahat\\StudioProjects\\AlphaVersion\\app\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4_abc_ic_star_black_36dp.png.flat",
@@ -1394,6 +1410,10 @@
     {
         "merged": "C:\\Users\\DavidHohevBaTahat\\StudioProjects\\AlphaVersion\\app\\build\\intermediates\\res\\merged\\debug\\drawable-xxxhdpi-v4_abc_btn_radio_to_on_mtrl_015.png.flat",
         "source": "C:\\Users\\DavidHohevBaTahat\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-28.0.0.aar\\f37dff965ddc510b1a891ea2badc9fff\\res\\drawable-xxxhdpi-v4\\abc_btn_radio_to_on_mtrl_015.png"
+    },
+    {
+        "merged": "C:\\Users\\DavidHohevBaTahat\\StudioProjects\\AlphaVersion\\app\\build\\intermediates\\res\\merged\\debug\\drawable_plus_icon.png.flat",
+        "source": "C:\\Users\\DavidHohevBaTahat\\StudioProjects\\AlphaVersion\\app\\src\\main\\res\\drawable\\plus_icon.png"
     },
     {
         "merged": "C:\\Users\\DavidHohevBaTahat\\StudioProjects\\AlphaVersion\\app\\build\\intermediates\\res\\merged\\debug\\layout_abc_popup_menu_item_layout.xml.flat",
