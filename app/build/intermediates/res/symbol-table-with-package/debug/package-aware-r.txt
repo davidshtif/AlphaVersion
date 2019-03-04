@@ -884,6 +884,7 @@ id textView3
 id textView4
 id textView5
 id textView6
+id textView7
 id time
 id title
 id titleDividerNoCustom

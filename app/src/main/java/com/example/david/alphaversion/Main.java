@@ -67,6 +67,34 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
         list=(ListView)findViewById(R.id.list);
         image=(ImageView) findViewById(R.id.imageView);
         pick=(TextView)findViewById(R.id.picked);
+
+
+        Thread t = new Thread(){
+            @Override
+            public void run(){
+                try{
+                    while(!isInterrupted()){
+                        Thread.sleep(1000);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                TextView time =(TextView) findViewById(R.id.textView7);
+                                long date = System.currentTimeMillis();
+                                SimpleDateFormat sdfD = new SimpleDateFormat("dd.MM.yy");
+                                SimpleDateFormat sdfT = new SimpleDateFormat("HH:mm:ss");
+                                String dateString = sdfD.format(date);
+                                String timeString = sdfT.format(date);
+                                time.setText("Current date: "+dateString+"   Current time: "+timeString);
+                            }
+                        });
+                    }
+                }catch(InterruptedException e){
+
+                }
+            }
+        };
+        t.start();
+
         et1.setText("");
         et2.setText("");
         pick.setText("");
@@ -357,7 +385,7 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
-        if (scanningResult != null) {
+        if (scanningResult.getContents() != null) {
             barcode= scanningResult.getContents();
             barcode= loadImageFromUrl(barcode,image);
             isScan=true;
