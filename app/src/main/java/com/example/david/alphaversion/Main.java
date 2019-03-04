@@ -84,7 +84,7 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
                                 SimpleDateFormat sdfT = new SimpleDateFormat("HH:mm:ss");
                                 String dateString = sdfD.format(date);
                                 String timeString = sdfT.format(date);
-                                time.setText("Current date: "+dateString+"   Current time: "+timeString);
+                                time.setText("Current date: "+dateString+"    Current time: "+timeString);
                             }
                         });
                     }
