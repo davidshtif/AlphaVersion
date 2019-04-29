@@ -1,11 +1,14 @@
 package com.example.david.alphaversion;
 
 import android.app.DatePickerDialog;
+import android.app.Notification;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -32,12 +35,13 @@ import com.google.zxing.integration.android.IntentResult;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.squareup.picasso.Picasso;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import static com.example.david.alphaversion.Fridge.CHANNEL_1_ID;
 
 public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
@@ -49,11 +53,13 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
     ImageView image;
     List<Product> productList;
     TextView pick;
+    int hours,minutes,days=7;
     boolean isScan;
     private AlertDialog.Builder dialogBuilder;
     private View dialogView;
     private TextView expDate;
     private Product currentProduct;
+    private NotificationManagerCompat notificationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +74,10 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
         image=(ImageView) findViewById(R.id.imageView);
         pick=(TextView)findViewById(R.id.picked);
 
+        notificationManager = NotificationManagerCompat.from(this);
 
-        Thread t = new Thread(){
+
+        Thread t1 = new Thread(){
             @Override
             public void run(){
                 try{
@@ -93,7 +101,88 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
                 }
             }
         };
-        t.start();
+        t1.start();
+
+
+        Thread t2 = new Thread(){
+            @Override
+            public void run(){
+                try{
+                    while(!isInterrupted()){
+                        Thread.sleep(60000);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ArrayAdapter adapter=new ProductList(Main.this,productList);
+                                if(adapter.getCount()!=0){
+
+                                    String not="The product/s that will expire in "+days+" days are:";
+                                    String exp=null;
+
+                                    for(int a=0;a<productList.size();a++){
+                                        Product product=productList.get(a);
+
+                                        String expired=product.getExpired();
+
+                                        if(expired!=null){
+                                            String dayS=expired.substring(0,2);
+                                            String monthS=expired.substring(3,5);
+                                            String yearS=expired.substring(6,10);
+                                            int day = Integer.parseInt(dayS);
+                                            int month = Integer.parseInt(monthS);
+                                            int year = Integer.parseInt(yearS);
+
+                                            Calendar thatDay = Calendar.getInstance();
+                                            thatDay.set(Calendar.DAY_OF_MONTH,day);
+                                            thatDay.set(Calendar.MONTH,(month-1));
+                                            thatDay.set(Calendar.YEAR,year);
+
+                                            Calendar today = Calendar.getInstance();
+                                            long date = System.currentTimeMillis();
+                                            SimpleDateFormat sdfT = new SimpleDateFormat("HH:mm:ss");
+                                            String timeString = sdfT.format(date);
+                                            String hour=timeString.substring(0,2);
+                                            String minute=timeString.substring(3,5);
+                                            String second=timeString.substring(6,8);
+                                            int millis=((Integer.parseInt(hour)*360000)+(Integer.parseInt(minute))*60000+(Integer.parseInt(second))*1000);
+
+                                            long curDiff = thatDay.getTimeInMillis() - today.getTimeInMillis() - millis;
+
+
+
+
+                                            if(((curDiff-(hours*3600000)-(minutes*60000))<=(days*86400000))&&((curDiff-(hours*3600000)-(minutes*60000))>((days*86400000)-60000))){
+                                                exp=product.getName();
+                                                not+="\n-"+exp;
+                                            }
+                                        }
+                                    }
+
+                                    if(exp!=null){
+                                        //send notification
+                                        Notification notification = new NotificationCompat.Builder(Main.this,CHANNEL_1_ID)
+                                                .setSmallIcon(R.drawable.ic_priority_high_black_24dp)
+                                                .setContentTitle("Expired product/s")
+                                                .setContentText(not)
+                                                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                                                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                                                .setStyle(new NotificationCompat.BigTextStyle().bigText(not))
+                                                .build();
+
+                                        notificationManager.notify(1, notification);
+
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }catch(InterruptedException e){
+
+                }
+            }
+        };
+        t2.start();
+
 
         et1.setText("");
         et2.setText("");
@@ -116,6 +205,12 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
         scan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                barcode="";
+                name="";
+                weight="";
+                et1.setText("");
+                et2.setText("");
+                image.setImageResource(R.drawable.no_image);
                 if(v.getId()==R.id.scan){
                     IntentIntegrator scanIntegrator = new IntentIntegrator(Main.this);
                     scanIntegrator.initiateScan();
@@ -157,7 +252,6 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
                 productList.clear();
 
                 for(DataSnapshot productSnapshot: dataSnapshot.getChildren()){
@@ -320,6 +414,14 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
         if(st.equals("Credits")){
             startActivity(credits);
         }
+        if(st.equals("Settings")){
+
+            dialogBuilder = new AlertDialog.Builder(this);
+            LayoutInflater inflater=getLayoutInflater();
+            dialogView = inflater.inflate(R.layout.settings_dialog,null);
+            dialogBuilder.setView(dialogView);
+
+        }
         return true;
     }
 
@@ -361,9 +463,13 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
                 .setCallback(new FutureCallback<String>() {
                     @Override
                     public void onCompleted(Exception e, String result) {
-                        result=result.substring(72,result.indexOf("</title>",49));
-                        result.substring(0,result.indexOf(","));
-                        weight=result.substring(result.indexOf(", ")+2);
+                        try {
+                            result=result.substring(72,result.indexOf("</title>",49));
+                            result.substring(0,result.indexOf(","));
+                            weight=result.substring(result.indexOf(", ")+2);
+                        } catch (Exception e1) {
+                            e1.printStackTrace();
+                        }
                     }
                 });
         return weight;
@@ -376,8 +482,12 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
                 .setCallback(new FutureCallback<String>() {
                     @Override
                     public void onCompleted(Exception e, String result) {
-                        result=result.substring(72,result.indexOf("</title>",49));
-                        name=result.substring(0,result.indexOf(","));
+                        try {
+                            result=result.substring(72,result.indexOf("</title>",49));
+                            name=result.substring(0,result.indexOf(","));
+                        } catch (Exception e1) {
+                            e1.printStackTrace();
+                        }
                     }
                 });
         return name;
@@ -396,11 +506,21 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
                         @Override
                         public void onCompleted(Exception e, String result) {
                             result=result.substring(72,result.indexOf("</title>",49));
-                            name=result.substring(0,result.indexOf(","));
-                            weight=result.substring(result.indexOf(", ")+2);
+                            try {
+                                name=result.substring(0,result.indexOf(","));
+                                weight=result.substring(result.indexOf(", ")+2);
+                            } catch (Exception e1) {
+                                e1.printStackTrace();
+                            }
 
-                            et1.setText(""+name);
-                            et2.setText(""+weight);
+                            try {
+                                if(name!=null&&weight!=null){
+                                    et1.setText(""+name);
+                                    et2.setText(""+weight);
+                                }
+                            } catch (Exception e1) {
+                                e1.printStackTrace();
+                            }
                         }
                     });
 
@@ -425,7 +545,23 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
 
     private String loadImageFromUrl(String barcode,ImageView image){
         String url="https://m.pricez.co.il/ProductPictures/"+barcode+".jpg";
-        Picasso.get().load(url).into(image);
+        try {
+            Picasso.get().load(url).into(image);
+        } catch (Exception e) {
+            e.printStackTrace();
+            image.setImageResource(R.drawable.no_image);
+        }
         return barcode;
+    }
+
+    public void delete(View view) {
+        et1.setText("");
+        name="";
+        et2.setText("");
+        weight="";
+        barcode=null;
+        pick.setText("");
+        isScan=false;
+        image.setImageResource(R.drawable.no_image);
     }
 }

@@ -67,19 +67,40 @@
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/picked"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="10dp"
-        android:text="" />
-
-    <Button
-        android:id="@+id/upload"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="upload"
-        android:text="upload" />
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/picked"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="10dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="delete"
+            android:text="delete" />
+
+        <Button
+            android:id="@+id/upload"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="upload"
+            android:text="upload" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
