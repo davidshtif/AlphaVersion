@@ -3,9 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
     android:gravity="center"
+    android:orientation="vertical"
     tools:context=".Main">
 
 
@@ -22,18 +23,22 @@
 
         <Button
             android:id="@+id/expired"
-            android:layout_width="wrap_content"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
+            android:textColor="@color/common_google_signin_btn_text_dark_default"
+            android:background="@drawable/buttonshape"
             android:text="expiration date" />
 
         <Space
-            android:layout_width="10dp"
+            android:layout_width="20dp"
             android:layout_height="match_parent" />
 
         <Button
             android:id="@+id/scan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/common_google_signin_btn_text_dark_default"
+            android:background="@drawable/buttonshape"
             android:text="scan" />
 
         <ImageView
@@ -45,24 +50,24 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
-            <EditText
-                android:id="@+id/editText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:hint="Enter product's name"
-                android:inputType="textPersonName" />
+        <EditText
+            android:id="@+id/editText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Enter product's name"
+            android:inputType="textPersonName" />
 
-            <EditText
-                android:id="@+id/editText2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:hint="Enter product's weight"
-                android:inputType="textPersonName" />
+        <EditText
+            android:id="@+id/editText2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Enter product's weight"
+            android:inputType="textPersonName" />
 
 
     </LinearLayout>
@@ -79,11 +84,17 @@
             android:text=""
             android:textSize="10dp" />
 
+        <TextView
+            android:id="@+id/diff"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -91,13 +102,21 @@
             android:id="@+id/delete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/common_google_signin_btn_text_dark_default"
+            android:background="@drawable/buttonshape"
             android:onClick="delete"
             android:text="delete" />
+
+        <Space
+            android:layout_width="20dp"
+            android:layout_height="match_parent" />
 
         <Button
             android:id="@+id/upload"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/common_google_signin_btn_text_dark_default"
+            android:background="@drawable/buttonshape"
             android:onClick="upload"
             android:text="upload" />
     </LinearLayout>
@@ -109,47 +128,47 @@
 
         <TextView
             android:id="@+id/textView2"
-            android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Name:" />
+            android:text="Name:"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/textView3"
-            android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Weight:" />
+            android:text="Weight:"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/textView4"
-            android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Entered on:" />
+            android:text="Entered on:"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/textView5"
-            android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Expiration date:" />
+            android:text="Expiration date:"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/textView6"
-            android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Image:" />
+            android:text="Image:"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <ListView
         android:id="@+id/list"
         android:layout_width="match_parent"
-        android:layout_height="280dp" />
+        android:layout_height="match_parent" />
 </LinearLayout>

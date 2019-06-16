@@ -62,6 +62,12 @@
         <activity android:name="com.example.david.alphaversion.Send" />
         <activity android:name="com.example.david.alphaversion.Send2" />
         <activity android:name="com.example.david.alphaversion.Credits" />
+
+        <receiver
+            android:name="com.example.david.alphaversion.MyAlarm"
+            android:enabled="true"
+            android:exported="true" />
+
         <activity
             android:name="com.google.firebase.auth.internal.FederatedSignInActivity"
             android:excludeFromRecents="true"

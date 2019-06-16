@@ -28,6 +28,10 @@
         <activity android:name=".Send" />
         <activity android:name=".Send2" />
         <activity android:name=".Credits"></activity>
+        <receiver
+            android:name=".MyAlarm"
+            android:enabled="true"
+            android:exported="true" />
     </application>
 
 </manifest>

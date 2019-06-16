@@ -11,6 +11,7 @@ anim abc_slide_out_bottom
 anim abc_slide_out_top
 anim abc_tooltip_enter
 anim abc_tooltip_exit
+array numbers
 attr actionBarDivider
 attr actionBarItemBackground
 attr actionBarPopupTheme
@@ -434,6 +435,7 @@ color material_grey_800
 color material_grey_850
 color material_grey_900
 color notification_action_color_filter
+color notification_color
 color notification_icon_bg_color
 color notification_material_background_media_default_color
 color primary_dark_material_dark
@@ -456,6 +458,7 @@ color switch_thumb_material_dark
 color switch_thumb_material_light
 color switch_thumb_normal_material_dark
 color switch_thumb_normal_material_light
+color title_color
 color tooltip_background_dark
 color tooltip_background_light
 color zxing_custom_possible_result_points
@@ -666,6 +669,7 @@ drawable abc_textfield_search_activated_mtrl_alpha
 drawable abc_textfield_search_default_mtrl_alpha
 drawable abc_textfield_search_material
 drawable abc_vector_test
+drawable buttonshape
 drawable common_full_open_on_phone
 drawable common_google_signin_btn_icon_dark
 drawable common_google_signin_btn_icon_dark_focused
@@ -690,6 +694,7 @@ drawable googleg_standard_color_18
 drawable ic_launcher_background
 drawable ic_launcher_foreground
 drawable ic_priority_high_black_24dp
+drawable ic_stat_name
 drawable no_image
 drawable notification_action_background
 drawable notification_bg
@@ -752,6 +757,8 @@ id bottom
 id button
 id button2
 id button3
+id button4
+id button5
 id buttonPanel
 id cancel
 id cancel_action
@@ -760,6 +767,7 @@ id centerCrop
 id center_horizontal
 id center_vertical
 id chains
+id checkBox
 id checkbox
 id chronometer
 id clip_horizontal
@@ -773,6 +781,7 @@ id dark
 id decor_content_parent
 id default_activity_button
 id delete
+id diff
 id dimensions
 id direct
 id disableHome

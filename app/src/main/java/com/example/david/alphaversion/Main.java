@@ -1,8 +1,13 @@
 package com.example.david.alphaversion;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.Notification;
+import android.app.PendingIntent;
+import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -18,11 +23,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -35,15 +43,19 @@ import com.google.zxing.integration.android.IntentResult;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.squareup.picasso.Picasso;
+
+import java.sql.Time;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import static com.example.david.alphaversion.Fridge.CHANNEL_1_ID;
 
-public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
+public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener, AdapterView.OnItemSelectedListener {
 
     EditText et1,et2;
     ListView list;
@@ -52,14 +64,15 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
     Button button,scan;
     ImageView image;
     List<Product> productList;
-    TextView pick;
-    int hours,minutes,days=7;
-    boolean isScan;
+    TextView pick,diff;
+    String hours="07",minutes="00",not;
+    int days=1;
+    boolean isScan,checked=false;
     private AlertDialog.Builder dialogBuilder;
     private View dialogView;
     private TextView expDate;
     private Product currentProduct;
-    private NotificationManagerCompat notificationManager;
+    private NotificationHelper notificationHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,8 +86,12 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
         list=(ListView)findViewById(R.id.list);
         image=(ImageView) findViewById(R.id.imageView);
         pick=(TextView)findViewById(R.id.picked);
+        diff=(TextView)findViewById(R.id.diff);
 
-        notificationManager = NotificationManagerCompat.from(this);
+        notificationHelper = new NotificationHelper(this);
+
+
+        productList=new ArrayList<>();
 
 
         Thread t1 = new Thread(){
@@ -88,7 +105,7 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
                             public void run() {
                                 TextView time =(TextView) findViewById(R.id.textView7);
                                 long date = System.currentTimeMillis();
-                                SimpleDateFormat sdfD = new SimpleDateFormat("dd.MM.yy");
+                                SimpleDateFormat sdfD = new SimpleDateFormat("dd/MM/yyyy");
                                 SimpleDateFormat sdfT = new SimpleDateFormat("HH:mm:ss");
                                 String dateString = sdfD.format(date);
                                 String timeString = sdfT.format(date);
@@ -109,72 +126,86 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
             public void run(){
                 try{
                     while(!isInterrupted()){
-                        Thread.sleep(60000);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                ArrayAdapter adapter=new ProductList(Main.this,productList);
-                                if(adapter.getCount()!=0){
+                        long date = System.currentTimeMillis();
+                        SimpleDateFormat sdfT = new SimpleDateFormat("HH:mm");
+                        String timeString = sdfT.format(date);
+                        String hour = timeString.substring(0,2);
+                        String minute = timeString.substring(3,5);
+                        if(hour.equals(hours)&&minute.equals(minutes)){
+                            Thread.sleep(10000);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ArrayAdapter adapter=new ProductList(Main.this,productList);
+                                    if(adapter.getCount()!=0){
+                                        ref.addValueEventListener(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                if (productList != null) {
+                                                    productList.clear();
 
-                                    String not="The product/s that will expire in "+days+" days are:";
-                                    String exp=null;
+                                                    for (DataSnapshot productSnapshot : dataSnapshot.getChildren()) {
+                                                        Product product = productSnapshot.getValue(Product.class);
 
-                                    for(int a=0;a<productList.size();a++){
-                                        Product product=productList.get(a);
+                                                        if (product.getExpired() != null) {
+                                                            String expired = product.getExpired();
+                                                            String message;
+                                                            String title = "Expired product";
 
-                                        String expired=product.getExpired();
+                                                            String dayS = expired.substring(0, 2);
+                                                            String monthS = expired.substring(3, 5);
+                                                            String yearS = expired.substring(6, 10);
+                                                            int day = Integer.parseInt(dayS);
+                                                            int month = Integer.parseInt(monthS);
+                                                            int year = Integer.parseInt(yearS);
 
-                                        if(expired!=null){
-                                            String dayS=expired.substring(0,2);
-                                            String monthS=expired.substring(3,5);
-                                            String yearS=expired.substring(6,10);
-                                            int day = Integer.parseInt(dayS);
-                                            int month = Integer.parseInt(monthS);
-                                            int year = Integer.parseInt(yearS);
+                                                            Calendar thatDay = Calendar.getInstance();
+                                                            thatDay.set(Calendar.DAY_OF_MONTH, day);
+                                                            thatDay.set(Calendar.MONTH, (month - 1));
+                                                            thatDay.set(Calendar.YEAR, year);
 
-                                            Calendar thatDay = Calendar.getInstance();
-                                            thatDay.set(Calendar.DAY_OF_MONTH,day);
-                                            thatDay.set(Calendar.MONTH,(month-1));
-                                            thatDay.set(Calendar.YEAR,year);
+                                                            Calendar today = Calendar.getInstance();
 
-                                            Calendar today = Calendar.getInstance();
-                                            long date = System.currentTimeMillis();
-                                            SimpleDateFormat sdfT = new SimpleDateFormat("HH:mm:ss");
-                                            String timeString = sdfT.format(date);
-                                            String hour=timeString.substring(0,2);
-                                            String minute=timeString.substring(3,5);
-                                            String second=timeString.substring(6,8);
-                                            int millis=((Integer.parseInt(hour)*360000)+(Integer.parseInt(minute))*60000+(Integer.parseInt(second))*1000);
-
-                                            long curDiff = thatDay.getTimeInMillis() - today.getTimeInMillis() - millis;
-
-
-
-
-                                            if(((curDiff-(hours*3600000)-(minutes*60000))<=(days*86400000))&&((curDiff-(hours*3600000)-(minutes*60000))>((days*86400000)-60000))){
-                                                exp=product.getName();
-                                                not+="\n-"+exp;
+                                                            long curDiff = thatDay.getTimeInMillis() - today.getTimeInMillis();
+                                                            diff.setText(""+curDiff);
+                                                            if (curDiff/8640000 < 0) {
+                                                                //send notification and remove from list
+                                                                if(!checked){
+                                                                    message = "" + product.getName() + " expired";
+                                                                    productList.add(product);
+                                                                }
+                                                                else{
+                                                                    message = "" + product.getName() + " expired and was removed from the list";
+                                                                    deleteProduct(product.getId());
+                                                                }
+                                                                NotificationCompat.Builder nb = notificationHelper.getChannel1Notification(title, message);
+                                                                notificationHelper.getManager().notify(1, nb.build());
+                                                            } else {
+                                                                productList.add(product);
+                                                                if (curDiff <= (days * 86400000)) {
+                                                                    //send notification
+                                                                    message = "" + product.getName() + " will expire in " + ((curDiff/86400000)+1) + " day/s";
+                                                                    NotificationCompat.Builder nb = notificationHelper.getChannel2Notification(title, message);
+                                                                    notificationHelper.getManager().notify(2, nb.build());
+                                                                }
+                                                            }
+                                                        } else {
+                                                            productList.add(product);
+                                                        }
+                                                    }
+                                                    onStart();
+                                                }
                                             }
-                                        }
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
                                     }
-
-                                    if(exp!=null){
-                                        //send notification
-                                        Notification notification = new NotificationCompat.Builder(Main.this,CHANNEL_1_ID)
-                                                .setSmallIcon(R.drawable.ic_priority_high_black_24dp)
-                                                .setContentTitle("Expired product/s")
-                                                .setContentText(not)
-                                                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                                                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
-                                                .setStyle(new NotificationCompat.BigTextStyle().bigText(not))
-                                                .build();
-
-                                        notificationManager.notify(1, notification);
-
-                                    }
+                                    adapter.notifyDataSetChanged();
                                 }
-                            }
-                        });
+                            });
+                        }
                     }
                 }catch(InterruptedException e){
 
@@ -189,7 +220,6 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
         pick.setText("");
 
         ref=FirebaseDatabase.getInstance().getReference("products");
-        productList=new ArrayList<>();
 
         button=(Button)findViewById(R.id.expired);
         scan=(Button)findViewById(R.id.scan);
@@ -199,7 +229,6 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
             public void onClick(View v) {
                 DialogFragment datePicker= new DatePickerFragment();
                 datePicker.show(getSupportFragmentManager(),"date picker");
-
             }
         });
         scan.setOnClickListener(new View.OnClickListener() {
@@ -229,11 +258,20 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        Calendar calendar=Calendar.getInstance();
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, month);
-        calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-        expired= DateFormat.getDateInstance(DateFormat.SHORT).format(calendar.getTime());
+        String sDay,sMonth;
+        if(dayOfMonth<10){
+            sDay = "0" + dayOfMonth;
+        }
+        else{
+            sDay = "" + dayOfMonth;
+        }
+        if(month<10){
+            sMonth = "0" + (month+1);
+        }
+        else{
+            sMonth = "" + (month+1);
+        }
+        expired = "" + sDay +"/" + sMonth + "/" + year;
         pick.setText("Date picked: "+expired);
         try {
             if(!productList.isEmpty()){
@@ -256,7 +294,6 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
 
                 for(DataSnapshot productSnapshot: dataSnapshot.getChildren()){
                     Product product=productSnapshot.getValue(Product.class);
-
                     productList.add(product);
                 }
                 ArrayAdapter adapter=new ProductList(Main.this,productList);
@@ -292,6 +329,7 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
         }
 
         expDate = (TextView) dialogView.findViewById(R.id.expDate);
+
 
 
         if(product.getExpired()!=null){
@@ -396,6 +434,7 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
     public boolean onCreateOptionsMenu(Menu menu){
         menu.add("Send SMS");
         menu.add("Send Email");
+        menu.add("Settings");
         menu.add("Credits");
         return true;
     }
@@ -421,6 +460,45 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
             dialogView = inflater.inflate(R.layout.settings_dialog,null);
             dialogBuilder.setView(dialogView);
 
+            final Spinner spinner = dialogView.findViewById(R.id.spinner);
+            spinner.setSelection(days);
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.array.numbers,android.R.layout.simple_spinner_item);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinner.setAdapter(adapter);
+            spinner.setOnItemSelectedListener(this);
+            final Button change = dialogView.findViewById(R.id.button4);
+            final Button ok = dialogView.findViewById(R.id.button5);
+            final CheckBox checkBox = dialogView.findViewById(R.id.checkBox);
+            TextView notify = dialogView.findViewById(R.id.textView10);
+            notify.setText("I want to get notified on:   "+hours+":"+minutes);
+
+            if(checked){
+                checkBox.setChecked(true);
+            }
+
+            dialogBuilder.setTitle("Settings");
+            final AlertDialog alertDialog= dialogBuilder.create();
+            alertDialog.show();
+
+            change.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view){
+                    DialogFragment timePicker = new TimePickerFragment();
+                    timePicker.show(getSupportFragmentManager(), "Time Picker");
+                }
+            });
+            ok.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view){
+                    if(checkBox.isChecked()){
+                        checked = true;
+                    }
+                    else{
+                        checked = false;
+                    }
+                    alertDialog.dismiss();
+                }
+            });
         }
         return true;
     }
@@ -432,9 +510,12 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
             name = setName();
             weight = setWeight();
         }
+
         Calendar date=Calendar.getInstance();
         Calendar time=Calendar.getInstance();
-        enterD=DateFormat.getDateInstance(DateFormat.SHORT).format(date.getTime());
+
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+        enterD=format.format(date.getTime());
         SimpleDateFormat mdformat=new SimpleDateFormat("HH:mm:ss");
         enterT=mdformat.format(time.getTime());
         if(name.equals(""))
@@ -563,5 +644,35 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
         pick.setText("");
         isScan=false;
         image.setImageResource(R.drawable.no_image);
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        String text = parent.getItemAtPosition(position).toString();
+        days = Integer.parseInt(text);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
+    @Override
+    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+        TextView notify = dialogView.findViewById(R.id.textView10);
+        if(hourOfDay<10){
+            hours = "0" + hourOfDay;
+        }
+        else{
+            hours = "" + hourOfDay;
+        }
+        if(minute<10){
+            minutes = "0" + minute;
+        }
+        else{
+            minutes = "" + minute;
+        }
+        notify.setText("I want to get notified on:   "+hours+":"+minutes);
+
     }
 }
