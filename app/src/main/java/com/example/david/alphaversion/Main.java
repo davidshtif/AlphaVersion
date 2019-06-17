@@ -1,19 +1,13 @@
 package com.example.david.alphaversion;
 
-import android.app.AlarmManager;
 import android.app.DatePickerDialog;
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.app.TimePickerDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -44,9 +38,6 @@ import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.squareup.picasso.Picasso;
 
-import java.sql.Time;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -64,7 +55,7 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
     Button button,scan;
     ImageView image;
     List<Product> productList;
-    TextView pick,diff;
+    TextView pick;
     String hours="07",minutes="00",not;
     int days=1;
     boolean isScan,checked=false;
@@ -86,7 +77,6 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
         list=(ListView)findViewById(R.id.list);
         image=(ImageView) findViewById(R.id.imageView);
         pick=(TextView)findViewById(R.id.picked);
-        diff=(TextView)findViewById(R.id.diff);
 
         notificationHelper = new NotificationHelper(this);
 
@@ -167,7 +157,6 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
                                                             Calendar today = Calendar.getInstance();
 
                                                             long curDiff = thatDay.getTimeInMillis() - today.getTimeInMillis();
-                                                            diff.setText(""+curDiff);
                                                             if (curDiff/8640000 < 0) {
                                                                 //send notification and remove from list
                                                                 if(!checked){
@@ -290,6 +279,7 @@ public class Main extends AppCompatActivity implements DatePickerDialog.OnDateSe
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
                 productList.clear();
 
                 for(DataSnapshot productSnapshot: dataSnapshot.getChildren()){
